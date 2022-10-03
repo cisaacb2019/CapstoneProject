@@ -28,64 +28,77 @@ import kotlinx.coroutines.withContext
 
 class ArticlesFragmentList : Fragment() {
 
-    private lateinit var binding : FragmentArticlesListBinding
+    private lateinit var binding: FragmentArticlesListBinding
     private val networkStatusChecker by lazy {
         NetworkStatusChecker(activity?.getSystemService(ConnectivityManager::class.java))
     }
-    private val ViewModel: myViewModel by viewModels{
+    private val ViewModel: myViewModel by viewModels {
         myViewModel.ModelFactory(newsService = buildAPIService())
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View {
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentArticlesListBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        getArticles()
+        swipeToRefresh()
+    }
+
+    private fun getArticles() {
         networkStatusChecker.performIfConnectedToInternet {
-            ViewModel.base.observe(viewLifecycleOwner) { articleResult ->
-                setArticles(articleResult.articles)
+            binding.srLayout.isRefreshing = true
+            ViewModel.articleLiveData.observe(viewLifecycleOwner) { articleResult ->
+                when (articleResult) {
+                    is Result.Success -> {
+                        setArticles(articleResult.value.articles)
+                    }
+                    is Result.Failure -> {
+                        //todo display a dialog to show failur//
+                    }
+                }
             }
-            if (!networkStatusChecker.hasInternetConnection()){
-                noInternet()
-            }else{
-                binding.rvArticles.visibility = View.VISIBLE
-                binding.ivNoInternet.visibility = View.GONE
-                binding.tvNoInternet.visibility = View.GONE
-            }
-            swipeToRefresh()
+            binding.srLayout.isRefreshing = false
         }
+        if (!networkStatusChecker.hasInternetConnection()) {
+            noInternet()
+        } else {
+            binding.rvArticles.visibility = View.VISIBLE
+            binding.ivNoInternet.visibility = View.GONE
+            binding.tvNoInternet.visibility = View.GONE
         }
+    }
 
-
-   private fun setArticles(articles: List<Article>){
-       val articleAdapter = NewsRecyclerAdapter(articles) { article ->
-           val direction =
-               ArticlesFragmentListDirections.actionArticlesFragmentListToDetailFragment(
-                   article
-               )
-       }
-       binding.rvArticles.run {
-           adapter = articleAdapter
-       }
+    private fun setArticles(articles: List<Article>) {
+        val articleAdapter = NewsRecyclerAdapter(articles) { article ->
+            val direction =
+                ArticlesFragmentListDirections.actionArticlesFragmentListToDetailFragment(
+                    article
+                )
+            findNavController().navigate(direction)
         }
+        binding.rvArticles.run {
+            adapter = articleAdapter
+        }
+    }
 
 
-    private fun noInternet(){
+    private fun noInternet() {
 
         binding.rvArticles.visibility = View.GONE
         binding.ivNoInternet.visibility = View.VISIBLE
         binding.tvNoInternet.visibility = View.VISIBLE
     }
 
-    private fun swipeToRefresh(){
-        val swipe : SwipeRefreshLayout = binding.srLayout
+    private fun swipeToRefresh() {
+        val swipe: SwipeRefreshLayout = binding.srLayout
         swipe.setOnRefreshListener {
-            ViewModel.base.observe(viewLifecycleOwner){article ->
-                setArticles(article.articles)
-            }
+            getArticles()
             swipe.isRefreshing = false
         }
     }

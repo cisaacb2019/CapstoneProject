@@ -115,6 +115,12 @@
                     android:textSize="18sp"
                     tools:text="Article Author Content" />
 
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/btn_dialog" />
+
             </LinearLayout>
 
         </ScrollView>

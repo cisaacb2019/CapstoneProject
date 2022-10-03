@@ -5,7 +5,10 @@ import com.cb.week5homeworkfinal.Country
 import com.cb.week5homeworkfinal.ModelData.Article
 import com.cb.week5homeworkfinal.ModelData.Constants.Companion.basekey
 import com.cb.week5homeworkfinal.ModelData.NewsResponse
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.cb.week5homeworkfinal.ModelData.Result
+import kotlinx.coroutines.withContext
 
 class myViewModel(private val newsService: NewsService): ViewModel() {
 
@@ -17,18 +20,18 @@ class myViewModel(private val newsService: NewsService): ViewModel() {
         }
     }
 
-    private val responsevalue = MutableLiveData<NewsResponse>()
-    val base: LiveData<NewsResponse> = responsevalue
-
+    private val responsevalue = MutableLiveData< Result<NewsResponse>>()
+    val articleLiveData: LiveData<Result<NewsResponse>> = responsevalue
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = newsService.getNews(basekey,Country.US)
-                responsevalue.value = response
-
+                val response = newsService.getNews(basekey, Country.US)
+                withContext(Dispatchers.Main){
+                    responsevalue.value = Result.Success(response)
+                }
             } catch (e: Exception){
-                com.cb.week5homeworkfinal.ModelData.Result.Failure(e)
+                responsevalue.value = Result.Failure(e)
             }
         }
 

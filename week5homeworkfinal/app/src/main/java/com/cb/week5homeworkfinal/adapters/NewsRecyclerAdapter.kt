@@ -9,20 +9,6 @@ class NewsRecyclerAdapter (
     private val OnNewsClick: (Article) -> Unit,
 ): RecyclerView.Adapter<NewsViewHolder>(){
 
-//lateinit var clickListener: ArticleViewClickListener
-// var ArticleList = articleList
-//
-//    interface ArticleViewClickListener {
-//        fun articleClicked(position:Int)
-//    }
-//
-//    fun setOnclickItemListener(listener: ArticleViewClickListener){
-//        clickListener = listener
-//    }
-
-
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val articleView = ArticleView(parent.context)
@@ -33,23 +19,16 @@ class NewsRecyclerAdapter (
         return NewsViewHolder(articleView)
     }
 
+
+override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
+    holder.itemView.setOnClickListener {
+        articlelist[position]?.let { it1 -> OnNewsClick(it1) }
+    }
+    articlelist[position]?.let { holder.bindData(it) }
+}
     override fun getItemCount(): Int {
         return articlelist.size
     }
-// override fun onBindViewHolder(holder: NewsViewHolder, position: Int,) {
-//    holder.articleAuthorView.text = ArticleList[position].author
-//    holder.articleTitleView.text = ArticleList[position].title
-//    holder.articleDescView.text = ArticleList[position].description
-//
-//
-// }
-override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
-    holder.itemView.setOnClickListener {
-        OnNewsClick(articlelist[position])
-    }
-    holder.bindData(articlelist[position])
-}
-
 
 
 }
