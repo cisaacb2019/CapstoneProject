@@ -60,6 +60,14 @@
                     tools:text="Source URL" />
 
                 <TextView
+                    android:id="@+id/tv_article_url_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textSize="18sp"
+                    tools:text="Article Author URL Image" />
+
+                <TextView
                     android:id="@+id/tv_article_author"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -90,14 +98,6 @@
                     android:layout_marginTop="16dp"
                     android:textSize="18sp"
                     tools:text="Article URL" />
-
-                <TextView
-                    android:id="@+id/tv_article_url_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:textSize="18sp"
-                    tools:text="Article Author URL Image" />
 
                 <TextView
                     android:id="@+id/tv_article_published_at"
