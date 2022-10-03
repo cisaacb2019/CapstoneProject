@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import androidx.work.*
 import com.bumptech.glide.Glide
 import com.cb.week5homeworkfinal.Workers.DownloadWorker
+import com.cb.week5homeworkfinal.Workers.FileClearWorker
 import com.cb.week5homeworkfinal.Workers.SepiaFilterWorker
 
 
@@ -49,7 +50,8 @@ class DetailFragment : Fragment() {
             .setRequiresStorageNotLow(true)
             .setRequiredNetworkType(NetworkType.NOT_ROAMING)
             .build()
-
+        val clearFilesWorker = OneTimeWorkRequestBuilder<FileClearWorker>()
+            .build()
         val downloadRequest = OneTimeWorkRequestBuilder<DownloadWorker>()
             .setInputData(workDataOf("image_path" to args.article.urlToImage))
             .setConstraints(constraints)
@@ -60,7 +62,7 @@ class DetailFragment : Fragment() {
 
 
         val workManager = context?.let { WorkManager.getInstance(it) }
-        workManager?.beginWith(downloadRequest)?.then(FilterWorker)?.enqueue()
+        workManager?.beginWith(clearFilesWorker)?.then(downloadRequest)?.then(FilterWorker)?.enqueue()
 
         workManager?.getWorkInfoByIdLiveData(FilterWorker.id)
             ?.observe(viewLifecycleOwner) { info ->
