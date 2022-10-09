@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
@@ -50,29 +51,34 @@ class ArticlesFragmentList : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         getArticles()
         swipeToRefresh()
+
+        val TextListener = object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let{ searchQuery ->
+                    viewModel.searchArticles(searchQuery)
+                }
+                return true
+            }
+        }
+
+        binding.searchView.setOnQueryTextListener(TextListener)
     }
 
     private fun getArticles(){
-        networkStatusChecker.performIfConnectedToInternet {
-            binding.srLayout.isRefreshing = true
-            viewModel.articles.observe(viewLifecycleOwner) { articleResult ->
-                when(articleResult){
-                    is com.cb.week5homeworkfinal.ModelData.Result.Success -> {
-                        setArticles(articleResult.value)
-                    }
-                    is com.cb.week5homeworkfinal.ModelData.Result.Failure -> {
-                        failureDialog()
-                    }
+        binding.srLayout.isRefreshing = true
+        viewModel.articles.observe(viewLifecycleOwner) { articleResult ->
+            when(articleResult){
+                is com.cb.week5homeworkfinal.ModelData.Result.Success -> {
+                    setArticles(articleResult.value)
                 }
-                binding.srLayout.isRefreshing = false
+                is com.cb.week5homeworkfinal.ModelData.Result.Failure -> {
+                    failureDialog()
+                }
             }
-        }
-        if (!networkStatusChecker.hasInternetConnection()){
-            noInternet()
-        }else{
-            binding.rvArticles.visibility = View.VISIBLE
-            binding.ivNoInternet.visibility = View.GONE
-            binding.tvNoInternet.visibility = View.GONE
+            binding.srLayout.isRefreshing = false
         }
     }
 
@@ -102,12 +108,6 @@ class ArticlesFragmentList : Fragment() {
         }
         builder?.create()?.show()
         binding.ivNoInternet.visibility = View.VISIBLE
-    }
-
-    private fun noInternet(){
-        binding.rvArticles.visibility = View.GONE
-        binding.ivNoInternet.visibility = View.VISIBLE
-        binding.tvNoInternet.visibility = View.VISIBLE
     }
 
     private fun swipeToRefresh(){
