@@ -2,6 +2,7 @@ package com.cb.week5homeworkfinal.Remote
 
 import androidx.lifecycle.*
 import com.cb.week5homeworkfinal.Country
+import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.ModelData.Article
 import com.cb.week5homeworkfinal.ModelData.Constants.Companion.basekey
 import com.cb.week5homeworkfinal.ModelData.NewsResponse
@@ -10,30 +11,17 @@ import kotlinx.coroutines.launch
 import com.cb.week5homeworkfinal.ModelData.Result
 import kotlinx.coroutines.withContext
 
-class myViewModel(private val newsService: NewsService): ViewModel() {
+class myViewModel(private val newsRepo: NewsRepo): ViewModel() {
 
-    class ModelFactory(
-        private val newsService: NewsService,
+    class Factory(
+        private val newsRepo: NewsRepo,
     ): ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return myViewModel(newsService) as T
+            return myViewModel(newsRepo) as T
         }
     }
 
-    private val responsevalue = MutableLiveData< Result<NewsResponse>>()
-    val articleLiveData: LiveData<Result<NewsResponse>> = responsevalue
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = newsService.getNews(basekey, Country.US)
-                withContext(Dispatchers.Main){
-                    responsevalue.value = Result.Success(response)
-                }
-            } catch (e: Exception){
-                responsevalue.value = Result.Failure(e)
-            }
-        }
-
-    }
+    val articles: LiveData<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>> =
+        newsRepo.getNewsArticles().asLiveData()
 }

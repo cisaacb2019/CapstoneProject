@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -22,18 +23,19 @@ import com.cb.week5homeworkfinal.Remote.buildAPIService
 import com.cb.week5homeworkfinal.Remote.myViewModel
 import com.cb.week5homeworkfinal.adapters.NewsRecyclerAdapter
 import com.cb.week5homeworkfinal.databinding.FragmentArticlesListBinding
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ArticlesFragmentList : Fragment() {
 
-    private lateinit var binding: FragmentArticlesListBinding
+    private lateinit var binding : FragmentArticlesListBinding
     private val networkStatusChecker by lazy {
         NetworkStatusChecker(activity?.getSystemService(ConnectivityManager::class.java))
     }
-    private val ViewModel: myViewModel by viewModels {
-        myViewModel.ModelFactory(newsService = buildAPIService())
+    private val viewModel: myViewModel by viewModels{
+        myViewModel.Factory(newsRepo = App.newsRepo)
     }
 
     override fun onCreateView(
@@ -50,31 +52,32 @@ class ArticlesFragmentList : Fragment() {
         swipeToRefresh()
     }
 
-    private fun getArticles() {
+    private fun getArticles(){
         networkStatusChecker.performIfConnectedToInternet {
             binding.srLayout.isRefreshing = true
-            ViewModel.articleLiveData.observe(viewLifecycleOwner) { articleResult ->
-                when (articleResult) {
-                    is Result.Success -> {
-                        setArticles(articleResult.value.articles)
+            viewModel.articles.observe(viewLifecycleOwner) { articleResult ->
+                when(articleResult){
+                    is com.cb.week5homeworkfinal.ModelData.Result.Success -> {
+                        setArticles(articleResult.value)
                     }
-                    is Result.Failure -> {
-                        //todo display a dialog to show failur//
+                    is com.cb.week5homeworkfinal.ModelData.Result.Failure -> {
+                        failureDialog()
                     }
                 }
+                binding.srLayout.isRefreshing = false
             }
-            binding.srLayout.isRefreshing = false
         }
-        if (!networkStatusChecker.hasInternetConnection()) {
+        if (!networkStatusChecker.hasInternetConnection()){
             noInternet()
-        } else {
+        }else{
             binding.rvArticles.visibility = View.VISIBLE
             binding.ivNoInternet.visibility = View.GONE
             binding.tvNoInternet.visibility = View.GONE
         }
     }
 
-    private fun setArticles(articles: List<Article>) {
+    private fun setArticles(articles: List<Article>){
+
         val articleAdapter = NewsRecyclerAdapter(articles) { article ->
             val direction =
                 ArticlesFragmentListDirections.actionArticlesFragmentListToDetailFragment(
@@ -87,16 +90,28 @@ class ArticlesFragmentList : Fragment() {
         }
     }
 
+    private fun failureDialog(){
+        val dialogTitle = "Error:"
+        val dialogMessage = com.cb.week5homeworkfinal.ModelData.Result.Failure(Exception("No data")).toString()
+        val builder = activity?.let { AlertDialog.Builder(it) }
 
-    private fun noInternet() {
+        builder?.setTitle(dialogTitle)
+        builder?.setMessage(dialogMessage)
+        builder?.setPositiveButton("Ok") {dialog, _ ->
+            dialog.dismiss()
+        }
+        builder?.create()?.show()
+        binding.ivNoInternet.visibility = View.VISIBLE
+    }
 
+    private fun noInternet(){
         binding.rvArticles.visibility = View.GONE
         binding.ivNoInternet.visibility = View.VISIBLE
         binding.tvNoInternet.visibility = View.VISIBLE
     }
 
-    private fun swipeToRefresh() {
-        val swipe: SwipeRefreshLayout = binding.srLayout
+    private fun swipeToRefresh(){
+        val swipe : SwipeRefreshLayout = binding.srLayout
         swipe.setOnRefreshListener {
             getArticles()
             swipe.isRefreshing = false

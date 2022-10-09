@@ -34,17 +34,20 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.tvSourceId.text = args.article.source?.name
+
+        binding.tvSourceId.text = args.article.source.name
         binding.tvSourceDescription.text = args.article.description
-        binding.tvSourceUrl.text = args.article.url
+        binding.tvSourceUrl.text = args.article.source.url
         binding.tvArticleAuthor.text = args.article.author
         binding.tvArticleDescription.text = args.article.url
         binding.tvArticlePublishedAt.text = args.article.publishedAt
         binding.tvArticleContent.text = args.article.content
         binding.tvArticleTitle.text = args.article.title
-        args.article.urlToImage?.let { ImageDownload() }
+        args.article.urlToImage?.let { downloadImage() }
     }
-    private fun ImageDownload() {
+
+
+    private fun downloadImage() {
         val constraints = Constraints.Builder()
             .setRequiresBatteryNotLow(true)
             .setRequiresStorageNotLow(true)
@@ -56,15 +59,22 @@ class DetailFragment : Fragment() {
             .setInputData(workDataOf("image_path" to args.article.urlToImage))
             .setConstraints(constraints)
             .build()
-        val FilterWorker = OneTimeWorkRequestBuilder<SepiaFilterWorker>()
+        val sepiaFilterWorker = OneTimeWorkRequestBuilder<SepiaFilterWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        val downloadImageWorker = OneTimeWorkRequestBuilder<DownloadWorker>()
             .setConstraints(constraints)
             .build()
 
 
         val workManager = context?.let { WorkManager.getInstance(it) }
-        workManager?.beginWith(clearFilesWorker)?.then(downloadRequest)?.then(FilterWorker)?.enqueue()
+        workManager
+            ?.beginWith(clearFilesWorker)
+            ?.then(downloadRequest)
+            ?.enqueue()
 
-        workManager?.getWorkInfoByIdLiveData(FilterWorker.id)
+        workManager?.getWorkInfoByIdLiveData(downloadRequest.id)
             ?.observe(viewLifecycleOwner) { info ->
                 GlobalScope.launch(Dispatchers.IO) {
                     if (info.state.isFinished) {
@@ -78,14 +88,15 @@ class DetailFragment : Fragment() {
                 }
             }
     }
-//display image with glide//
+
     private fun displayImage(imagePath: String) {
-            Glide.with(this)
-                .load(imagePath)
-                .into(binding.imageView)
+        GlobalScope.launch(Dispatchers.Main) {
+            val bitmap = loadImageFromFile(imagePath)
+            binding.imageView.setImageBitmap(bitmap)
         }
     }
 
     private suspend fun loadImageFromFile(imagePath: String) = withContext(Dispatchers.IO) {
         BitmapFactory.decodeFile(imagePath)
     }
+}

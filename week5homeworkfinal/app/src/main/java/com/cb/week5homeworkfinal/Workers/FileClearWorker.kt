@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 
+
 class FileClearWorker (context: Context, workerParameters: WorkerParameters)
-        : Worker(context, workerParameters) {
+    : Worker(context, workerParameters) {
 
     override fun doWork(): Result {
         val root = applicationContext.externalMediaDirs.first()
@@ -22,6 +23,6 @@ class FileClearWorker (context: Context, workerParameters: WorkerParameters)
         }catch (error: Throwable){
             error.printStackTrace()
             Result.failure()
-            }
         }
     }
+}
