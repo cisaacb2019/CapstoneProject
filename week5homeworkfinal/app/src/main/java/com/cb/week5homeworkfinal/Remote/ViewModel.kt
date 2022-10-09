@@ -1,15 +1,12 @@
 package com.cb.week5homeworkfinal.Remote
 
 import androidx.lifecycle.*
-import com.cb.week5homeworkfinal.Country
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.ModelData.Article
-import com.cb.week5homeworkfinal.ModelData.Constants.Companion.basekey
-import com.cb.week5homeworkfinal.ModelData.NewsResponse
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.cb.week5homeworkfinal.ModelData.Result
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 
 class myViewModel(private val newsRepo: NewsRepo): ViewModel() {
 
@@ -22,6 +19,24 @@ class myViewModel(private val newsRepo: NewsRepo): ViewModel() {
         }
     }
 
-    val articles: LiveData<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>> =
-        newsRepo.getNewsArticles().asLiveData()
+    init {
+        viewModelScope.launch(IO) {
+            newsRepo
+                .getNewsArticles()
+                .onEach { newArticles ->
+                    responseValue.postValue(newArticles)
+                }
+                .collect()
+        }
+    }
+
+    fun searchArticles(search: String){
+        viewModelScope.launch(IO) {
+            val filteredArticles = newsRepo.searchNews("%$search%")
+            responseValue.postValue(com.cb.week5homeworkfinal.ModelData.Result.Success(filteredArticles))
+        }
+    }
+
+    private val responseValue = MutableLiveData<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>>()
+    val articles: LiveData<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>> = responseValue
 }

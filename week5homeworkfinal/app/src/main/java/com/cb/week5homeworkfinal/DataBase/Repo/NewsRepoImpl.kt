@@ -36,6 +36,9 @@ class NewsRepoImpl(
         }
 
     }
+    override suspend fun searchNews(search: String): List<Article> {
+        return articleDao.searchNews(search)
+    }
     companion object {
         private const val TAG = "ArticleRepoImpl"
     }

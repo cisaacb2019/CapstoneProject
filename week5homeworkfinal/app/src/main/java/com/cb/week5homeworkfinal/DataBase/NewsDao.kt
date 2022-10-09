@@ -13,4 +13,6 @@ interface NewsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addArticles(article: List<Article>)
+    @Query("SELECT * FROM articles WHERE title LIKE :search")
+    suspend fun searchNews(search: String) : List<Article>
 }
