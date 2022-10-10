@@ -14,7 +14,7 @@ import java.io.IOException
 
 
 private const val STORE_NAME = "user_preferences"
-
+//tried to adjust to datastore but was unable to get it to save reverted to dark mode//
 private val Context.dataStore by preferencesDataStore(
     name = STORE_NAME,
     produceMigrations = {context ->
@@ -32,16 +32,16 @@ class PrefsStoreImpl (private val context: Context) : PrefsStore {
         }else{
             throw exception
         }
-    }.map { it[PreferencesKeys.NIGHT_MODE_KEY]  ?: false }
+    }.map { it[PreferencesKeys.Internet_Mode_Key]  ?: false }
 
     override suspend fun toogleinternetMode() {
         context.dataStore.edit {
-            it[PreferencesKeys.NIGHT_MODE_KEY] = !(it[PreferencesKeys.NIGHT_MODE_KEY] ?: false )
+            it[PreferencesKeys.Internet_Mode_Key] = !(it[PreferencesKeys.Internet_Mode_Key] ?: false )
         }
     }
 
     private object PreferencesKeys{
-        val NIGHT_MODE_KEY = booleanPreferencesKey("dark_theme_enabled")
+        val Internet_Mode_Key = booleanPreferencesKey("dark_theme_enabled")
     }
 
 }
