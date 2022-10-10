@@ -4,11 +4,13 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -32,13 +34,15 @@ import kotlinx.coroutines.withContext
 class ArticlesFragmentList : Fragment() {
 
     private lateinit var binding : FragmentArticlesListBinding
+
     private val networkStatusChecker by lazy {
         NetworkStatusChecker(activity?.getSystemService(ConnectivityManager::class.java))
     }
     private val viewModel: myViewModel by viewModels{
-        myViewModel.Factory(newsRepo = App.newsRepo)
+        myViewModel.Factory(newsRepo = App.newsRepo, prefsStore = App.prefsStore)
     }
-
+    private var myInternetMode = true // set to true by default to require wifi so not to
+    //disrupt the users data plan
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,6 +69,22 @@ class ArticlesFragmentList : Fragment() {
         }
 
         binding.searchView.setOnQueryTextListener(TextListener)
+        viewModel.wifiEnabled.observe(viewLifecycleOwner){ toggleInternetActive ->
+            myInternetMode = toggleInternetActive
+
+            val defaultMode = if (toggleInternetActive){
+                //if data to be used
+
+                //temp use for night mode
+                AppCompatDelegate.MODE_NIGHT_YES
+            }else{
+                //if data to not be used
+
+                //temp use for night mode
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+            //default data used true
+        }
     }
 
     private fun getArticles(){
@@ -116,5 +136,11 @@ class ArticlesFragmentList : Fragment() {
             getArticles()
             swipe.isRefreshing = false
         }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.internetSwitch) {
+            viewModel.toggleinternetMode()
+        }
+        return true
     }
 }

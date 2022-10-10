@@ -1,6 +1,7 @@
 package com.cb.week5homeworkfinal.Remote
 
 import androidx.lifecycle.*
+import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.ModelData.Article
 import kotlinx.coroutines.launch
@@ -8,14 +9,14 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.collect
 
-class myViewModel(private val newsRepo: NewsRepo): ViewModel() {
+class myViewModel(private val newsRepo: NewsRepo, private val prefsStore: PrefsStore): ViewModel() {
 
     class Factory(
-        private val newsRepo: NewsRepo,
+        private val newsRepo: NewsRepo, private val prefsStore: PrefsStore
     ): ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return myViewModel(newsRepo) as T
+            return myViewModel(newsRepo, prefsStore) as T
         }
     }
 
@@ -39,4 +40,11 @@ class myViewModel(private val newsRepo: NewsRepo): ViewModel() {
 
     private val responseValue = MutableLiveData<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>>()
     val articles: LiveData<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>> = responseValue
+
+    val wifiEnabled = prefsStore.isInternetMode().asLiveData()
+    fun toggleinternetMode(){
+        viewModelScope.launch {
+            prefsStore.toogleinternetMode()
+        }
+    }
 }

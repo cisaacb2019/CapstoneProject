@@ -6,6 +6,28 @@
     android:layout_height="match_parent"
     android:layout_marginTop="10dp">
 
+    <Switch
+        android:id="@+id/internetSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="650dp"
+        android:minHeight="48dp"
+        android:text="Use Wifi?"
+        android:translationZ="1dp" />
+
+    <SearchView
+        android:id="@+id/search_view"
+        android:translationZ="1dp"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/grey"
+        android:foregroundGravity="top" >
+
+    </SearchView>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,14 +37,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
-            <SearchView
-                android:id="@+id/search_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:background="@color/grey" />
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/sr_layout"

@@ -2,14 +2,16 @@ package com.cb.week5homeworkfinal.Fragments
 
 import android.app.Application
 import com.cb.week5homeworkfinal.DataBase.NewsArticleDatabase
+import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
+import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStoreImpl
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepoImpl
-import com.cb.week5homeworkfinal.Remote.RemoteApi
 import com.cb.week5homeworkfinal.Remote.buildAPIService
 import com.google.gson.Gson
 
 class App : Application() {
     companion object {
+        private const val KEY_PREFERENCES = "newsAppPreferences"
         private lateinit var instance: App
         private val database: NewsArticleDatabase by lazy {
             NewsArticleDatabase.buildDatabase(instance)
@@ -24,6 +26,9 @@ class App : Application() {
 
         val GSONLAZY by lazy {
             Gson()
+        }
+        val prefsStore: PrefsStore by lazy {
+            PrefsStoreImpl(instance)
         }
     }
         override fun onCreate() {
