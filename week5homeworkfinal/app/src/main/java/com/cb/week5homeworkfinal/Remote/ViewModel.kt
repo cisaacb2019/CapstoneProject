@@ -47,4 +47,10 @@ class myViewModel(private val newsRepo: NewsRepo, private val prefsStore: PrefsS
             prefsStore.toogleinternetMode()
         }
     }
+    fun testMessage(message: String): String {
+        return message
+    }
+    fun testPrint(message: String) {
+        println(message)
+    }
 }

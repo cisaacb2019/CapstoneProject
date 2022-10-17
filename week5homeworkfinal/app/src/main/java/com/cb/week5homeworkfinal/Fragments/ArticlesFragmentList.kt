@@ -2,6 +2,7 @@ package com.cb.week5homeworkfinal.Fragments
 
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -93,6 +94,7 @@ class ArticlesFragmentList : Fragment() {
             when(articleResult){
                 is com.cb.week5homeworkfinal.ModelData.Result.Success -> {
                     setArticles(articleResult.value)
+                    Log.d("RecievedArticles","Articles Recieved")
                 }
                 is com.cb.week5homeworkfinal.ModelData.Result.Failure -> {
                     failureDialog()
@@ -119,6 +121,7 @@ class ArticlesFragmentList : Fragment() {
     private fun failureDialog(){
         val dialogTitle = "Error:"
         val dialogMessage = com.cb.week5homeworkfinal.ModelData.Result.Failure(Exception("No data")).toString()
+        Log.e("FD","$dialogMessage")
         val builder = activity?.let { AlertDialog.Builder(it) }
 
         builder?.setTitle(dialogTitle)
@@ -134,6 +137,7 @@ class ArticlesFragmentList : Fragment() {
         val swipe : SwipeRefreshLayout = binding.srLayout
         swipe.setOnRefreshListener {
             getArticles()
+            Log.d("SwipeRefreshSuccess","Refreshed successfully")
             swipe.isRefreshing = false
         }
     }

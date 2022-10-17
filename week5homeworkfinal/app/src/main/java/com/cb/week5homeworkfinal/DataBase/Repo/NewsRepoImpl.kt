@@ -3,6 +3,7 @@ package com.cb.week5homeworkfinal.DataBase.Repo
 import android.util.Log
 import com.cb.week5homeworkfinal.Country
 import com.cb.week5homeworkfinal.DataBase.NewsDao
+import com.cb.week5homeworkfinal.Fragments.App.Companion.prefsStore
 import com.cb.week5homeworkfinal.ModelData.Article
 import com.cb.week5homeworkfinal.ModelData.Constants.Companion.basekey
 import com.cb.week5homeworkfinal.Remote.NewsService
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.flow
 
 class NewsRepoImpl(
     private val articleDao: NewsDao,
-    private val newsApiService: NewsService
+    private val newsApiService: NewsService,
+
 ) : NewsRepo {
 
     override fun getNewsArticles(): Flow<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>> {
@@ -42,4 +44,5 @@ class NewsRepoImpl(
     companion object {
         private const val TAG = "ArticleRepoImpl"
     }
+    override fun isDataUsage(): Flow<Boolean> = prefsStore.isInternetMode()
 }

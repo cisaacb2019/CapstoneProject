@@ -77,4 +77,14 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation "androidx.datastore:datastore-core:1.1.0-dev01"
     implementation "com.google.protobuf:protobuf-javalite:3.11.0"
+    //Tests Depends
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    testImplementation 'androidx.arch.core:core-testing:2.1.0'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    testImplementation "io.mockk:mockk:1.13.2"
+    androidTestImplementation "io.mockk:mockk-android:1.13.2"
+
 }

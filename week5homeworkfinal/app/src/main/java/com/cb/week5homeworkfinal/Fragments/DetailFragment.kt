@@ -2,6 +2,7 @@ package com.cb.week5homeworkfinal
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -59,13 +60,13 @@ class DetailFragment : Fragment() {
             .setInputData(workDataOf("image_path" to args.article.urlToImage))
             .setConstraints(constraints)
             .build()
-        val sepiaFilterWorker = OneTimeWorkRequestBuilder<SepiaFilterWorker>()
-            .setConstraints(constraints)
-            .build()
-
-        val downloadImageWorker = OneTimeWorkRequestBuilder<DownloadWorker>()
-            .setConstraints(constraints)
-            .build()
+//        val sepiaFilterWorker = OneTimeWorkRequestBuilder<SepiaFilterWorker>()
+//            .setConstraints(constraints)
+//            .build()
+//
+//        val downloadImageWorker = OneTimeWorkRequestBuilder<DownloadWorker>()
+//            .setConstraints(constraints)
+//            .build()
 
 
         val workManager = context?.let { WorkManager.getInstance(it) }
@@ -90,6 +91,7 @@ class DetailFragment : Fragment() {
     }
 
     private fun displayImage(imagePath: String) {
+        Log.d("DisplayImage","Attempted to display image")
         GlobalScope.launch(Dispatchers.Main) {
             val bitmap = loadImageFromFile(imagePath)
             binding.imageView.setImageBitmap(bitmap)
