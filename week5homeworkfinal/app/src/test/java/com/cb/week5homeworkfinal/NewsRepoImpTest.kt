@@ -85,4 +85,16 @@ class NewsRepositoryImpTest {
             Assert.assertEquals(0, articles.size)
         }
     }
+    @Test
+    fun `when articles are fetched partial articles is returned`() {
+
+        val flowArticleState = newsRepository.getNewsArticles()
+
+        coEvery { mockArticleDao.getArticles() } returns listOf(dummyArticle)
+
+        runBlocking {
+            assertEquals(com.cb.week5homeworkfinal.ModelData.Result.Failure(throw Exception("TEST")),
+                flowArticleState.first())
+        }
+    }
 }
