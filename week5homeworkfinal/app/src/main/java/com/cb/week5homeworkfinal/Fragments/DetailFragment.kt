@@ -18,8 +18,9 @@ import com.bumptech.glide.Glide
 import com.cb.week5homeworkfinal.Workers.DownloadWorker
 import com.cb.week5homeworkfinal.Workers.FileClearWorker
 import com.cb.week5homeworkfinal.Workers.SepiaFilterWorker
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailBinding

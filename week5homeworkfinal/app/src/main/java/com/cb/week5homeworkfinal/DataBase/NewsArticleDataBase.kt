@@ -10,21 +10,21 @@ import com.cb.week5homeworkfinal.Source
 
 
 private const val DATABASE_VERSION = 1
-@Database(entities = [Article::class, Source::class] , version = DATABASE_VERSION)
+@Database (entities = [Article::class, Source::class] , version = DATABASE_VERSION)
 @TypeConverters(DataConverter::class)
 abstract class NewsArticleDatabase : RoomDatabase() {
-    companion object{
-        private const val DATABASE_NAME = "NewsArticles"
-        fun buildDatabase(context: Context): NewsArticleDatabase {
-            return Room.databaseBuilder(
-                context,
-                NewsArticleDatabase::class.java,
-                DATABASE_NAME,
-            )
-                .allowMainThreadQueries()
-                .build()
-        }
-    }
+//    companion object{
+//        private const val DATABASE_NAME = "NewsArticles"
+//        fun buildDatabase(context: Context): NewsArticleDatabase {
+//            return Room.databaseBuilder(
+//                context,
+//                NewsArticleDatabase::class.java,
+//                DATABASE_NAME,
+//            )
+//                .allowMainThreadQueries()
+//                .build()
+//        }
+//    }
     abstract fun articleDao(): NewsDao
     abstract fun sourceDao(): SourceDao
 }

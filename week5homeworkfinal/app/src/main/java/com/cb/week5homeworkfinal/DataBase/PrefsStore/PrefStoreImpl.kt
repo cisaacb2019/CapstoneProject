@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-
+import javax.inject.Inject
 
 
 private const val STORE_NAME = "user_preferences"
@@ -25,11 +25,11 @@ private val Context.dataStore by preferencesDataStore(
     }
 )
 
-class PrefsStoreImpl (private val context: Context) : PrefsStore {
+class PrefsStoreImpl @Inject constructor(private val dataStore: DataStore<Preferences>) : PrefsStore {
 
 //    private var appContext = context.applicationContext
 
-    override fun isInternetMode() = context.dataStore.data.catch { exception ->
+    override fun isInternetMode() = dataStore.data.catch { exception ->
         if (exception is IOException){
             emit(emptyPreferences())
         }else{
@@ -38,7 +38,7 @@ class PrefsStoreImpl (private val context: Context) : PrefsStore {
     }.map { it[PreferencesKeys.Internet_Mode_Key]  ?: false }
 
     override suspend fun toogleinternetMode() {
-        context.dataStore.edit {
+        dataStore.edit {
             it[PreferencesKeys.Internet_Mode_Key] = !(it[PreferencesKeys.Internet_Mode_Key] ?: false)
         }
     }

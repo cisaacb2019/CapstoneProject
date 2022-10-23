@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface NewsRepo {
     fun getNewsArticles() : Flow<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>>
     suspend fun searchNews(search: String) : List<Article>
-    fun isDataUsage(): Flow<Boolean>
+//    fun isDataUsage(): Flow<Boolean>
 }

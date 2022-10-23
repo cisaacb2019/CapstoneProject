@@ -4,12 +4,15 @@ import androidx.lifecycle.*
 import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.ModelData.Article
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
-class myViewModel(private val newsRepo: NewsRepo, private val prefsStore: PrefsStore): ViewModel() {
+@HiltViewModel
+class myViewModel @Inject constructor(private val newsRepo: NewsRepo, private val prefsStore: PrefsStore): ViewModel() {
 
     class Factory(
         private val newsRepo: NewsRepo, private val prefsStore: PrefsStore

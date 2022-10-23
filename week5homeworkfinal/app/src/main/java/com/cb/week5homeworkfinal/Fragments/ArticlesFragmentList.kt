@@ -18,29 +18,37 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
+import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.ModelData.Article
 import com.cb.week5homeworkfinal.ModelData.NewsResponse
 import com.cb.week5homeworkfinal.ModelData.Result
 import com.cb.week5homeworkfinal.R
 import com.cb.week5homeworkfinal.Remote.NetworkStatusChecker
-import com.cb.week5homeworkfinal.Remote.buildAPIService
+//import com.cb.week5homeworkfinal.Remote.buildAPIService
 import com.cb.week5homeworkfinal.Remote.myViewModel
 import com.cb.week5homeworkfinal.adapters.NewsRecyclerAdapter
 import com.cb.week5homeworkfinal.databinding.FragmentArticlesListBinding
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ArticlesFragmentList : Fragment() {
 
     private lateinit var binding : FragmentArticlesListBinding
 
-    private val networkStatusChecker by lazy {
-        NetworkStatusChecker(activity?.getSystemService(ConnectivityManager::class.java))
-    }
+    @Inject
+    lateinit var newsArticleRepo: NewsRepo
+
+    @Inject
+    lateinit var prefsStore: PrefsStore
+
     private val viewModel: myViewModel by viewModels{
-        myViewModel.Factory(newsRepo = App.newsRepo, prefsStore = App.prefsStore)
+        myViewModel.Factory(newsRepo = newsArticleRepo, prefsStore = prefsStore)
     }
     private var myInternetMode = true // set to true by default to require wifi so not to
     //disrupt the users data plan
