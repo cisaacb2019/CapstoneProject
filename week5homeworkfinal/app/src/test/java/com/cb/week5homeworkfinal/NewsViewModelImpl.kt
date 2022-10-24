@@ -1,8 +1,9 @@
 package com.cb.week5homeworkfinal
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
-import com.cb.week5homeworkfinal.Fragments.App.Companion.prefsStore
+//import com.cb.week5homeworkfinal.Fragments.App.Companion.prefsStore
 import com.cb.week5homeworkfinal.Remote.myViewModel
 import io.mockk.every
 import io.mockk.mockk
@@ -23,13 +24,15 @@ class NewsViewModelTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    private lateinit var prefstore: PrefsStore
+
     @Test
     fun `When calling print message actually prints out the message`() {
         val mockRepo = spyk<NewsRepo>()
 
         every { mockRepo.isDataUsage() } answers {
             flow {
-                val viewModel = myViewModel(mockRepo, prefsStore)
+                val viewModel = myViewModel(mockRepo, prefstore)
 
                 Assert.assertEquals("This is a test", viewModel.testMessage("This is a test"))
                 verify(exactly = 1) { mockRepo.isDataUsage() }
@@ -43,8 +46,10 @@ class NewsViewModelTest {
             every { mockRepo.isDataUsage() } answers {
                 flow { }
             }
-            val viewModel = myViewModel(mockRepo, prefsStore)
+            val viewModel = myViewModel(mockRepo, prefstore)
             viewModel.testPrint("Test")
             verify(exactly = 1) { viewModel.testMessage("Test1") }
         }
+
+
     }

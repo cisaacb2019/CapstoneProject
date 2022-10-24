@@ -3,6 +3,7 @@ package com.cb.week5homeworkfinal.DataBase.Repo
 import android.util.Log
 import com.cb.week5homeworkfinal.Country
 import com.cb.week5homeworkfinal.DataBase.NewsDao
+import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
 import com.cb.week5homeworkfinal.ModelData.Article
 import com.cb.week5homeworkfinal.ModelData.Constants.Companion.basekey
 import com.cb.week5homeworkfinal.Remote.NetworkStatusChecker
@@ -15,6 +16,7 @@ class NewsRepoImpl @Inject constructor(
     private val articleDao: NewsDao,
     private val newsApiService: NewsService,
     private val networkStatusChecker: NetworkStatusChecker,
+    private val prefs: PrefsStore
 ) : NewsRepo {
 
     override fun getNewsArticles(): Flow<com.cb.week5homeworkfinal.ModelData.Result<List<Article>>> {
@@ -47,5 +49,5 @@ class NewsRepoImpl @Inject constructor(
     companion object {
         private const val TAG = "ArticleRepoImpl"
     }
-//    override fun isDataUsage(): Flow<Boolean> = prefsStore.isInternetMode()
+    override fun isDataUsage(): Flow<Boolean> = prefs.isInternetMode()
 }

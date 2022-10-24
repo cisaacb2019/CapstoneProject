@@ -1,8 +1,10 @@
 package com.cb.week5homeworkfinal
 
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.cb.week5homeworkfinal.DataBase.NewsDao
 import com.cb.week5homeworkfinal.DataBase.PrefsStore.PrefsStore
+import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepo
 import com.cb.week5homeworkfinal.DataBase.Repo.NewsRepoImpl
 import com.cb.week5homeworkfinal.DataBase.SourceDao
 import com.cb.week5homeworkfinal.ModelData.Article
@@ -12,6 +14,8 @@ import com.cb.week5homeworkfinal.Remote.RemoteApi
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -22,11 +26,21 @@ import org.junit.Test
 
 class NewsRepositoryImpTest {
     @MockK
-    lateinit var mockArticleDao: NewsDao
-    @MockK
-    lateinit var mockNewsService:NewsService
     lateinit var testexeption: java.lang.Exception
-    private lateinit var newsRepository: NewsRepoImpl
+
+    private val mockNewsService = mockk<NewsService>()
+    private val mockNewsDao = mockk<NewsDao>()
+    private val mockPrefsStore = mockk<PrefsStore>()
+    private val mockNetworkStatusChecker = mockk<NetworkStatusChecker>()
+
+    private val ServiceTest = NewsRepoImpl(mockNewsDao,
+        mockNewsService,
+        mockNetworkStatusChecker,
+        mockPrefsStore
+        )
+
+
+
     private val dummyArticle = Article(
         Source(id = "Test" , name = "CNN"),
         "Test",
@@ -39,12 +53,8 @@ class NewsRepositoryImpTest {
     )
 
     @Before
-    fun setUp() {
-        MockKAnnotations.init(this)
-        newsRepository = NewsRepoImpl(
-            mockArticleDao,
-            mockNewsService
-        )
+    fun setup() {
+        mockkStatic(Log::class)
     }
 
     @get:Rule
@@ -53,12 +63,12 @@ class NewsRepositoryImpTest {
     @Test
     fun `When articles are searched through title return list of matched articles`() {
 
-        coEvery { mockArticleDao.searchNews(any()) } answers {
+        coEvery { mockNewsDao.searchNews(any()) } answers {
             listOf(dummyArticle)
         }
 
         runBlocking {
-            val articles = newsRepository.searchNews("test")
+            val articles = ServiceTest.searchNews("test")
 
             Assert.assertEquals(1, articles.size)
         }
@@ -66,9 +76,9 @@ class NewsRepositoryImpTest {
     @Test
     fun `when articles are fetched ready with articles is returned`() {
 
-        val flowArticleState = newsRepository.getNewsArticles()
+        val flowArticleState = ServiceTest.getNewsArticles()
 
-        coEvery { mockArticleDao.getArticles() } returns listOf(dummyArticle)
+        coEvery { mockNewsDao.getArticles() } returns listOf(dummyArticle)
 
         runBlocking {
             assertEquals(com.cb.week5homeworkfinal.ModelData.Result.Success(listOf(dummyArticle)), flowArticleState.first())
@@ -77,24 +87,25 @@ class NewsRepositoryImpTest {
     }
     @Test
     fun `When articles are searched through no articles are matched return empty`() {
-        coEvery { mockArticleDao.searchNews(any()) } answers {
+        coEvery { ServiceTest.searchNews(any()) } answers {
             listOf()
         }
         runBlocking {
-            val articles = newsRepository.searchNews("US")
+            val articles = ServiceTest.searchNews("US")
             Assert.assertEquals(0, articles.size)
         }
     }
-    @Test
-    fun `when articles are fetched partial articles is returned`() {
-
-        val flowArticleState = newsRepository.getNewsArticles()
-
-        coEvery { mockArticleDao.getArticles() } returns listOf(dummyArticle)
-
-        runBlocking {
-            assertEquals(com.cb.week5homeworkfinal.ModelData.Result.Failure(throw Exception("TEST")),
-                flowArticleState.first())
-        }
-    }
+    //todo rework according to feedback on assignment//
+//    @Test
+//    fun `when articles are fetched partial articles is returned`() {
+//
+//        val flowArticleState = ServiceTest.getNewsArticles()
+//
+//        coEvery { mockNewsDao.getArticles() } returns listOf(dummyArticle)
+//
+//        runBlocking {
+//            assertEquals(com.cb.week5homeworkfinal.ModelData.Result.Failure(throw Exception("TEST")),
+//                flowArticleState.first())
+//        }
+//    }
 }
